@@ -4,15 +4,22 @@ using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.Queries
 {
-    public class UserQueries : ObjectGraphType
+    public class UserQueries : IQuery
     {
+        private readonly IUserRepository _repository;
+
         public UserQueries(IUserRepository repository)
         {
-            Field<UserType>("user",
+            _repository = repository;
+        }
+
+        public void SetupQueryDefinitions(ObjectGraphType type)
+        {
+            type.Field<UserType>("user",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = "id"}
+                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.Id}
                 ),
-                resolve: context => repository.GetById(context.GetArgument<string>("id")));
+                resolve: context => _repository.GetById(context.GetArgument<string>(SchemaConstants.Id)));
         }
     }
 }

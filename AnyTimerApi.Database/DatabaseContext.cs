@@ -15,6 +15,11 @@ namespace AnyTimerApi.Database
         {
             base.OnModelCreating(builder);
 
+            builder.Entity<AnyTimer>().HasOne(timer => timer.Requester)
+                .WithMany(user => user.Sent);
+            builder.Entity<AnyTimer>().HasOne(timer => timer.Receiver)
+                .WithMany(user => user.Received);
+
             // Use Snake Case naming conventions in database
             builder.Model.GetEntityTypes().ForEach(entity =>
             {
@@ -28,5 +33,6 @@ namespace AnyTimerApi.Database
         }
 
         public DbSet<User> Users { get; set; }
+        public DbSet<AnyTimer> AnyTimers { get; set; }
     }
 }

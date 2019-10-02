@@ -1,7 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
 using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
 using AnyTimerApi.GraphQL.Queries;
@@ -11,11 +8,8 @@ using AnyTimerApi.Repository.Database;
 using GraphQL;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
-using GraphQL.Server.Ui.Playground;
-using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -42,12 +36,15 @@ namespace AnyTimerApi
 
             services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetService));
             services.AddScoped<IUserRepository, UserRepository>();
+            services.AddScoped<IAnyTimerRepository, AnyTimerRepository>();
 
             services.AddScoped<UserType>();
+            services.AddScoped<AnyTimerType>();
 
             services.AddScoped<UserQueries>();
+            services.AddScoped<AnyTimerQueries>();
 
-            services.AddScoped<AnyTimerSchema>();
+            services.AddScoped<AppSchema>();
 
             services.AddGraphQL(options =>
                 {
@@ -69,8 +66,7 @@ namespace AnyTimerApi
             }
 
             app.UseHttpsRedirection();
-            app.UseGraphQL<AnyTimerSchema>();
-//            app.UseGraphQLPlayground(new GraphQLPlaygroundOptions());
+            app.UseGraphQL<AppSchema>();
             app.UseGraphiQLServer(new GraphiQLOptions());
             app.UseMvc();
         }
