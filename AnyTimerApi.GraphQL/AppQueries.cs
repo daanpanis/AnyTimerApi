@@ -14,6 +14,7 @@ namespace AnyTimerApi.GraphQL
             _provider = provider;
             SetupQuery<AnyTimerQueries>();
             SetupQuery<UserQueries>();
+            SetupQuery<FriendRequestQueries>();
         }
 
         private void SetupQuery<T>() where T : IQuery

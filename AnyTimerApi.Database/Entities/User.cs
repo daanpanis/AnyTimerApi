@@ -11,9 +11,5 @@ namespace AnyTimerApi.Database.Entities
         public string Name { get; set; }
 
         [Required] public int Age { get; set; }
-
-        public virtual ICollection<AnyTimer> Received { get; set; }
-
-        public virtual ICollection<AnyTimer> Sent { get; set; }
     }
 }

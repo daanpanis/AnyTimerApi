@@ -1,13 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Security.Claims;
+using System.Threading.Tasks;
 using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
+using AnyTimerApi.GraphQL.Authentication;
 using AnyTimerApi.GraphQL.Queries;
 using AnyTimerApi.GraphQL.Types;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
+using AnyTimerApi.Utilities.Extensions;
+using AspNetCore.Firebase.Authentication.Extensions;
 using GraphQL;
 using GraphQL.Server;
+using GraphQL.Server.Internal;
 using GraphQL.Server.Ui.GraphiQL;
+using GraphQL.Types;
+using GraphQL.Validation;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
@@ -32,17 +41,28 @@ namespace AnyTimerApi
         public void ConfigureServices(IServiceCollection services)
         {
             services.AddDbContext<DatabaseContext>(options =>
-                options.UseMySql(Configuration["ConnectionStrings:Database"]));
+                options.UseMySql(Configuration["ConnectionStrings:Database"],
+                    b => b.MigrationsAssembly("AnyTimerApi.Database")));
+
+            services.AddFirebaseAuthentication("https://securetoken.google.com/" + Configuration["Jwt:ProjectId"],
+                Configuration["Jwt:ProjectId"]);
 
             services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetService));
             services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAnyTimerRepository, AnyTimerRepository>();
+            services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
 
             services.AddScoped<UserType>();
             services.AddScoped<AnyTimerType>();
+            services.AddScoped<FriendRequestType>();
+            services.AddScoped<FriendRequestStatusType>();
 
             services.AddScoped<UserQueries>();
             services.AddScoped<AnyTimerQueries>();
+            services.AddScoped<FriendRequestQueries>();
+
+
+            services.AddTransient<IValidationRule>(s => new AuthenticationValidationRule());
 
             services.AddScoped<AppSchema>();
 
@@ -51,6 +71,7 @@ namespace AnyTimerApi
                     options.EnableMetrics = true;
                     options.ExposeExceptions = true;
                 })
+                .AddUserContextBuilder(httpContext => new GraphQLUserContext {User = httpContext.User})
                 .AddGraphTypes(ServiceLifetime.Scoped);
 
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_2).AddJsonOptions(options =>
@@ -68,6 +89,7 @@ namespace AnyTimerApi
             app.UseHttpsRedirection();
             app.UseGraphQL<AppSchema>();
             app.UseGraphiQLServer(new GraphiQLOptions());
+
             app.UseMvc();
         }
     }

@@ -17,33 +17,36 @@ namespace AnyTimerApi.GraphQL.Queries
 
         public void SetupQueryDefinitions(ObjectGraphType type)
         {
-            type.Field<AnyTimerType>(
+            type.FieldAsync<AnyTimerType>(
                 "anytimer",
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.Id}
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
-                    if (Guid.TryParse(context.GetArgument<string>("ownerId"), out var id)) return _repository.ById(id);
+                    if (Guid.TryParse(context.GetArgument<string>("ownerId"), out var id))
+                        return await _repository.ById(id);
                     context.Errors.Add(new ExecutionError("Wrong value for guid"));
                     return null;
                 }
             );
 
-            type.Field<ListGraphType<AnyTimerType>>(
+            type.FieldAsync<ListGraphType<AnyTimerType>>(
                 "received",
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
                 ),
-                resolve: context => _repository.ReceivedByUser(context.GetArgument<string>(SchemaConstants.UserId))
+                resolve: async context =>
+                    await _repository.ReceivedByUser(context.GetArgument<string>(SchemaConstants.UserId))
             );
 
-            type.Field<ListGraphType<AnyTimerType>>(
+            type.FieldAsync<ListGraphType<AnyTimerType>>(
                 "sent",
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
                 ),
-                resolve: context => _repository.SentByUser(context.GetArgument<string>(SchemaConstants.UserId))
+                resolve: async context =>
+                    await _repository.SentByUser(context.GetArgument<string>(SchemaConstants.UserId))
             );
         }
     }

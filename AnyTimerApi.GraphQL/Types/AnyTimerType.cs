@@ -9,15 +9,15 @@ namespace AnyTimerApi.GraphQL.Types
         public AnyTimerType(IUserRepository repository)
         {
             Field(a => a.Id, type: typeof(IdGraphType));
-            Field(a => a.Amount);
+//            Field(a => a.Amount);
             Field<UserType>(
                 "receiver",
                 resolve: context => repository.GetById(context.Source.ReceiverId)
             );
-            Field<UserType>(
+            /*Field<UserType>(
                 "requester",
                 resolve: context => repository.GetById(context.Source.RequesterId)
-            );
+            );*/
         }
     }
 }

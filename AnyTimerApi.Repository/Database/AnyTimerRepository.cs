@@ -29,7 +29,8 @@ namespace AnyTimerApi.Repository.Database
 
         public async Task<IEnumerable<AnyTimer>> SentByUser(string userId)
         {
-            return await _context.AnyTimers.Where(anyTimer => anyTimer.RequesterId.Equals(userId)).ToListAsync();
+//            return await _context.AnyTimers.Where(anyTimer => anyTimer.RequesterId.Equals(userId)).ToListAsync();
+            throw new NotImplementedException();
         }
     }
 }

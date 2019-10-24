@@ -15,10 +15,14 @@ namespace AnyTimerApi.Database
         {
             base.OnModelCreating(builder);
 
-            builder.Entity<AnyTimer>().HasOne(timer => timer.Requester)
-                .WithMany(user => user.Sent);
-            builder.Entity<AnyTimer>().HasOne(timer => timer.Receiver)
-                .WithMany(user => user.Received);
+            builder.Entity<StatusEvent>().HasKey(evt => new {evt.AnyTimerId, evt.Status});
+            builder.Entity<Comment>().HasKey(comment => new
+            {
+                comment.AnyTimerId, comment.UserId, comment.Time
+            });
+            builder.Entity<AnyTimerSender>().HasKey(sender => new {sender.AnyTimerId, sender.SenderId});
+            builder.Entity<FriendRequest>().HasOne(request => request.Requester);
+            builder.Entity<FriendRequest>().HasOne(request => request.Requested);
 
             // Use Snake Case naming conventions in database
             builder.Model.GetEntityTypes().ForEach(entity =>
@@ -34,5 +38,9 @@ namespace AnyTimerApi.Database
 
         public DbSet<User> Users { get; set; }
         public DbSet<AnyTimer> AnyTimers { get; set; }
+        public DbSet<AnyTimerSender> AnyTimerSenders { get; set; }
+        public DbSet<Comment> Comments { get; set; }
+        public DbSet<FriendRequest> FriendRequests { get; set; }
+        public DbSet<StatusEvent> StatusEvents { get; set; }
     }
 }
