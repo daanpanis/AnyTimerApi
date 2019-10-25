@@ -86,6 +86,7 @@ namespace AnyTimerApi
                 app.UseDeveloperExceptionPage();
             }
 
+            app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseGraphQL<AppSchema>();
             app.UseGraphiQLServer(new GraphiQLOptions());
