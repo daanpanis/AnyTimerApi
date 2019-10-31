@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 using AnyTimerApi.Database.Entities;
@@ -17,5 +18,7 @@ namespace AnyTimerApi.Repository
         Task<ICollection<FriendRequest>> ByUser(string userId);
 
         Task<ICollection<User>> GetFriends(string userId);
+
+        Task<FriendRequest> AddFriendRequest(string requesterId, string requestedId, DateTime time);
     }
 }

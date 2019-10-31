@@ -10,7 +10,7 @@ namespace AnyTimerApi.GraphQL.Types
         {
             Field(r => r.Id, type: typeof(IdGraphType));
             Field<FriendRequestStatusType>("Status");
-//            Field(r => r.LastUpdated);
+            Field(r => r.CreatedTime);
             Field<UserType>(
                 "requester",
                 resolve: context => userRepository.GetById(context.Source.RequesterId)

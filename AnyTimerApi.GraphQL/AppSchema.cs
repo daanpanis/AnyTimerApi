@@ -10,6 +10,7 @@ namespace AnyTimerApi.GraphQL
         public AppSchema(IServiceProvider serviceProvider) : base(serviceProvider)
         {
             Query = new AppQueries(serviceProvider);
+            Mutation = new AppMutations(serviceProvider);
         }
     }
 }

@@ -1,21 +1,16 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk">
 
     <PropertyGroup>
-        <TargetFramework>netcoreapp2.2</TargetFramework>
+        <TargetFramework>netcoreapp3.0</TargetFramework>
     </PropertyGroup>
 
     <ItemGroup>
       <PackageReference Include="GraphQL" Version="3.0.0-preview-1268" />
-      <PackageReference Include="Microsoft.AspNetCore.Http.Abstractions" Version="2.2.0" />
     </ItemGroup>
 
     <ItemGroup>
       <ProjectReference Include="..\AnyTimerApi.Database\AnyTimerApi.Database.csproj" />
       <ProjectReference Include="..\AnyTimerApi.Repository\AnyTimerApi.Repository.csproj" />
-    </ItemGroup>
-
-    <ItemGroup>
-      <Folder Include="Mutations" />
     </ItemGroup>
 
 </Project>

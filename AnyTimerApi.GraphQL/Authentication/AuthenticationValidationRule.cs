@@ -48,7 +48,7 @@ namespace AnyTimerApi.GraphQL.Authentication
             ValidationContext context,
             OperationType operationType)
         {
-            if (context.Errors.Any(error => error.Code.Equals("authentication")) || type == null ||
+            if (context.Errors.Any(error => error.Code.Equals(GraphQLErrors.AuthenticationRequired.KeyCode)) || type == null ||
                 !type.DoesRequireAuthentication())
             {
                 return;
@@ -56,11 +56,8 @@ namespace AnyTimerApi.GraphQL.Authentication
 
             if (!(userContext?.User?.Identity != null && userContext.User.Identity.IsAuthenticated))
             {
-                context.ReportError(new ValidationError(
-                    context.OriginalQuery,
-                    "authentication",
-                    $"You must be authenticated to run this {operationType.ToString().ToLower()}."
-                ));
+                context.ReportError(new ValidationError(context.OriginalQuery,
+                    GraphQLErrors.AuthenticationRequired.KeyCode, GraphQLErrors.AuthenticationRequired.Message));
             }
         }
     }

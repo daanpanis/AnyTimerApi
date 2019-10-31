@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -55,6 +56,20 @@ namespace AnyTimerApi.Repository.Database
                                   request.Status == FriendRequestStatus.Accepted)
                 .Select(request => request.RequesterId.Equals(userId) ? request.Requested : request.Requester)
                 .ToListAsync();
+        }
+
+        public async Task<FriendRequest> AddFriendRequest(string requesterId, string requestedId, DateTime time)
+        {
+            var request = new FriendRequest
+            {
+                Id = Guid.NewGuid().ToString(),
+                RequesterId = requestedId,
+                RequestedId = requestedId,
+                Status = FriendRequestStatus.Requested,
+                CreatedTime = time
+            };
+            await _context.FriendRequests.AddAsync(request);
+            return request;
         }
     }
 }

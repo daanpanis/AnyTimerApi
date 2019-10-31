@@ -13,5 +13,8 @@ namespace AnyTimerApi.Database.Entities
 
         public string RequestedId { get; set; }
         [ForeignKey("RequestedId")] public User Requested { get; set; }
+
+        [Required]
+        public DateTime CreatedTime { get; set; }
     }
 }
