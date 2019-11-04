@@ -63,11 +63,21 @@ namespace AnyTimerApi
             {
                 app.UseDeveloperExceptionPage();
             }
+            else
+            {
+                InitializeDatabase(app);
+            }
 
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseGraphQL<AppSchema>();
             app.UseGraphiQLServer(new GraphiQLOptions());
+        }
+        
+        private void InitializeDatabase(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+            scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.Migrate();
         }
     }
 }

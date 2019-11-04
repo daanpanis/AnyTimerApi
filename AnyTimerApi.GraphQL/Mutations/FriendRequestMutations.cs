@@ -41,6 +41,7 @@ namespace AnyTimerApi.GraphQL.Mutations
                     }
 
                     await _repository.AddFriendRequest(response.RequesterId, response.RequestedId, response.Time);
+                    // TODO Send push notification
                     return response;
                 }
             ).RequiresAuthentication();

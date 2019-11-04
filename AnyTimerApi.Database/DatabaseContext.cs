@@ -1,5 +1,6 @@
 using AnyTimerApi.Database.Entities;
 using AnyTimerApi.Utilities.Extensions;
+using Marques.EFCore.SnakeCase;
 using Microsoft.EntityFrameworkCore;
 
 namespace AnyTimerApi.Database
@@ -13,7 +14,8 @@ namespace AnyTimerApi.Database
         protected override void OnModelCreating(ModelBuilder builder)
         {
             base.OnModelCreating(builder);
-
+            builder.ToSnakeCase();
+            
             builder.Entity<StatusEvent>().HasKey(evt => new {evt.AnyTimerId, evt.Status});
             builder.Entity<Comment>().HasKey(comment => new
             {
@@ -22,19 +24,8 @@ namespace AnyTimerApi.Database
             builder.Entity<AnyTimerSender>().HasKey(sender => new {sender.AnyTimerId, sender.SenderId});
             builder.Entity<FriendRequest>().HasOne(request => request.Requester);
             builder.Entity<FriendRequest>().HasOne(request => request.Requested);
-
-            // Use Snake Case naming conventions in database
-            builder.Model.GetEntityTypes().ForEach(entity =>
-            {
-                /*entity.Relational().TableName = entity.Relational().TableName.ToSnakeCase();
-                entity.GetProperties().ForEach(property =>
-                    property.Relational().ColumnName = property.Relational().ColumnName.ToSnakeCase());
-                entity.GetKeys().ForEach(key => key.Relational().Name = key.Relational().Name.ToSnakeCase());
-                entity.GetForeignKeys().ForEach(key => key.Relational().Name = key.Relational().Name.ToSnakeCase());
-                entity.GetIndexes().ForEach(index => index.Relational().Name = index.Relational().Name.ToSnakeCase());*/
-            });
         }
-
+        
         public DbSet<User> Users { get; set; }
         public DbSet<AnyTimer> AnyTimers { get; set; }
         public DbSet<AnyTimerSender> AnyTimerSenders { get; set; }

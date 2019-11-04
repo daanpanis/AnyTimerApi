@@ -16,5 +16,11 @@
       <ProjectReference Include="..\AnyTimerApi.Database\AnyTimerApi.Database.csproj" />
       <ProjectReference Include="..\AnyTimerApi.GraphQL\AnyTimerApi.GraphQL.csproj" />
     </ItemGroup>
+    
+    <ItemGroup>
+        <None Update="localhost.pfx">
+            <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+        </None>
+    </ItemGroup>
 
 </Project>

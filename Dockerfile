@@ -1,5 +1,8 @@
 FROM mcr.microsoft.com/dotnet/core/aspnet:3.0-buster-slim AS base
 WORKDIR /app
+
+ENV ASPNETCORE_URLS "https://+443;http://+80"
+
 EXPOSE 80
 EXPOSE 443
 
@@ -16,4 +19,5 @@ RUN dotnet publish "AnyTimerApi.csproj" -c Release -o /app/publish
 FROM base AS final
 WORKDIR /app
 COPY --from=publish /app/publish .
-ENTRYPOINT ["dotnet","AnyTimerApi.dll"]
+
+ENTRYPOINT ["dotnet", "AnyTimerApi.dll"]
