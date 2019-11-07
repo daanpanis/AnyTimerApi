@@ -1,7 +1,10 @@
+using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AnyTimerApi.GraphQL.Authentication;
 using FirebaseAdmin.Auth;
 using GraphQL.Types;
+using Microsoft.AspNetCore.Http;
 
 namespace AnyTimerApi.GraphQL.Extensions
 {
@@ -17,21 +20,24 @@ namespace AnyTimerApi.GraphQL.Extensions
             return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
-        public static Task<UserRecord> UserRecord<T>(this ResolveFieldContext<T> context)
+        public static async Task<UserRecord> UserRecord<T>(this ResolveFieldContext<T> context)
         {
-            return context.UserRecord(context.User()?.GetUserId());
+            return await UserService.FromRequest(context.User());
         }
 
         public static async Task<UserRecord> UserRecord<T>(this ResolveFieldContext<T> context, string userId)
         {
-            try
-            {
-                return userId != null ? await FirebaseAuth.DefaultInstance.GetUserAsync(userId) : null;
-            }
-            catch (FirebaseAuthException ex)
-            {
-                return null;
-            }
+            return await UserService.ById(userId);
+        }
+
+        public static void BindUser(this HttpContext context)
+        {
+            UserService.UnBindContextUser(context.User);
+        }
+
+        public static void UnBindUser(this HttpContext context)
+        {
+            UserService.BindContextUser(context.User);
         }
     }
 }

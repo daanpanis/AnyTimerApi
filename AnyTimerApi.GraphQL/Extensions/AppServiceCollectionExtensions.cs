@@ -5,15 +5,15 @@ using AnyTimerApi.GraphQL.Queries;
 using AnyTimerApi.GraphQL.Types;
 using GraphQL;
 using GraphQL.Validation;
+using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
-namespace AnyTimerApi.GraphQL
+namespace AnyTimerApi.GraphQL.Extensions
 {
     public static class AppServiceCollectionExtensions
     {
-        public static void AddAnyTimerApp(this IServiceCollection services)
+        public static void AddAnyTimerApp(this IServiceCollection services, IConfiguration configuration = null)
         {
-            services.AddSingleton(k => new UserService(250));
             services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetService));
             services.AddScoped<UserType>();
             services.AddScoped<AnyTimerType>();
@@ -30,6 +30,17 @@ namespace AnyTimerApi.GraphQL
             services.AddTransient<IValidationRule>(s => new AuthenticationValidationRule());
 
             services.AddScoped<AppSchema>();
+
+            
+            
+            if (configuration == null) return;
+            try
+            {
+                UserService.CacheSize = Convert.ToInt32(configuration["AppSettings:UserCacheSize"]);
+            }
+            catch (FormatException)
+            {
+            }
         }
     }
 }

@@ -1,14 +1,18 @@
 ﻿using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
 using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
 using AspNetCore.Firebase.Authentication.Extensions;
 using FirebaseAdmin;
+using GraphQL.Introspection;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
+using GraphQL.Types;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Server.Kestrel.Core;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -24,7 +28,7 @@ namespace AnyTimerApi
             using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
             scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.Migrate();
         }
-        
+
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -54,7 +58,7 @@ namespace AnyTimerApi
             services.AddScoped<IAnyTimerRepository, AnyTimerRepository>();
             services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
 
-            services.AddAnyTimerApp();
+            services.AddAnyTimerApp(Configuration);
 
             services.AddGraphQL(options =>
                 {
@@ -80,7 +84,15 @@ namespace AnyTimerApi
             app.UseAuthentication();
             app.UseHttpsRedirection();
             app.UseGraphQL<AppSchema>();
+            ConfigureMiddleware<AppSchema, GraphQLAppMiddleware<AppSchema>>(app);
             app.UseGraphiQLServer(new GraphiQLOptions());
+        }
+
+        private static void ConfigureMiddleware<TSchema, TMiddleware>(IApplicationBuilder app)
+            where TSchema : ISchema
+            where TMiddleware : GraphQLAppMiddleware<TSchema>
+        {
+            app.UseMiddleware<TMiddleware>(new PathString("/graphql"));
         }
     }
 }

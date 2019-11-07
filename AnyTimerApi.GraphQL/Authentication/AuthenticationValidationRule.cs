@@ -13,13 +13,7 @@ namespace AnyTimerApi.GraphQL.Authentication
             var userContext = context.UserContext as GraphQLUserContext;
             return new EnterLeaveListener(_ =>
             {
-                var operationType = OperationType.Query;
-
-                _.Match<Operation>(type =>
-                {
-                    operationType = type.OperationType;
-                    CheckAuth(context.TypeInfo.GetLastType(), userContext, context, operationType);
-                });
+                _.Match<Operation>(type => { CheckAuth(context.TypeInfo.GetLastType(), userContext, context); });
 
                 _.Match<ObjectField>(type =>
                 {
@@ -28,7 +22,7 @@ namespace AnyTimerApi.GraphQL.Authentication
                         return;
 
                     var fieldType = argumentType.GetField(type.Name);
-                    CheckAuth(fieldType, userContext, context, operationType);
+                    CheckAuth(fieldType, userContext, context);
                 });
 
                 _.Match<Field>(type =>
@@ -37,18 +31,18 @@ namespace AnyTimerApi.GraphQL.Authentication
 
                     if (fieldDef == null) return;
 
-                    CheckAuth(fieldDef, userContext, context, operationType);
-                    CheckAuth(fieldDef.ResolvedType.GetNamedType(), userContext, context, operationType);
+                    CheckAuth(fieldDef, userContext, context);
+                    CheckAuth(fieldDef.ResolvedType.GetNamedType(), userContext, context);
                 });
             });
         }
 
         private static void CheckAuth(IProvideMetadata type,
             GraphQLUserContext userContext,
-            ValidationContext context,
-            OperationType operationType)
+            ValidationContext context)
         {
-            if (context.Errors.Any(error => error.Code.Equals(GraphQLErrors.AuthenticationRequired.KeyCode)) || type == null ||
+            if (context.Errors.Any(error => error.Code.Equals(GraphQLErrors.AuthenticationRequired.KeyCode)) ||
+                type == null ||
                 !type.DoesRequireAuthentication())
             {
                 return;
