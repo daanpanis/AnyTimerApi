@@ -1,7 +1,7 @@
 using System;
 using System.Diagnostics;
 using AnyTimerApi.Database.Entities;
-using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.GraphQL.Types;
 using AnyTimerApi.Repository;
 using GraphQL.Types;
@@ -19,20 +19,21 @@ namespace AnyTimerApi.GraphQL.Queries
 
         public void SetupQueryDefinitions(ObjectGraphType type)
         {
-            type.Field<UserType>("user",
+            type.FieldAsync<UserType>("user",
                 arguments: new QueryArguments(
                     new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.Id}
                 ),
-                resolve: context =>
+                resolve: async context =>
                 {
+                    var userRecord = await context.UserRecord();
                     Console.WriteLine(((GraphQLUserContext) context.UserContext).User);
                     Debug.WriteLine(((GraphQLUserContext) context.UserContext).User);
-//                    return _repository.GetById(context.GetArgument<string>(SchemaConstants.Id));
                     return new User
                     {
-                        Name = ((GraphQLUserContext) context.UserContext).User.Identity.IsAuthenticated + ""
+                        Id = context.GetArgument<string>(SchemaConstants.Id),
+                        Name = ((GraphQLUserContext) context?.UserContext)?.User?.Identity?.IsAuthenticated + ""
                     };
-                }).RequiresAuthentication();
+                });
         }
     }
 }

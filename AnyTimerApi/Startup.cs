@@ -3,6 +3,7 @@ using AnyTimerApi.GraphQL;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
 using AspNetCore.Firebase.Authentication.Extensions;
+using FirebaseAdmin;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
 using Microsoft.AspNetCore.Builder;
@@ -28,6 +29,7 @@ namespace AnyTimerApi
         // For more information on how to configure your application, visit https://go.microsoft.com/fwlink/?LinkID=398940
         public void ConfigureServices(IServiceCollection services)
         {
+            FirebaseApp.Create();
             services.AddDbContext<DatabaseContext>(options =>
                 options.UseMySql(Configuration["ConnectionStrings:Database"],
                     b => b.MigrationsAssembly("AnyTimerApi.Database")));

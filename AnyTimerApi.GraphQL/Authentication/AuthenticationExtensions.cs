@@ -16,7 +16,7 @@ namespace AnyTimerApi.GraphQL.Authentication
             var authenticatedValue = metadata.Metadata.ContainsKey(AuthenticatedKey)
                 ? metadata.Metadata[AuthenticatedKey]
                 : null;
-            return authenticatedValue == null || (bool) authenticatedValue;
+            return authenticatedValue != null && (bool) authenticatedValue;
         }
     }
 }

@@ -7,5 +7,6 @@ namespace AnyTimerApi.GraphQL
         public const string Friends = "friends";
         public const string Requester = "requester";
         public const string Requested = "requested";
+        public const string Name = "name";
     }
 }

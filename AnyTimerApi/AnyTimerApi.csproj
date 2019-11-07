@@ -6,6 +6,7 @@
 
     <ItemGroup>
         <PackageReference Include="AspNetCore.Firebase.Authentication" Version="2.0.1" />
+        <PackageReference Include="FirebaseAdmin" Version="1.9.1" />
         <PackageReference Include="GraphQL" Version="3.0.0-preview-1268" />
         <PackageReference Include="GraphQL.Server.Transports.AspNetCore" Version="3.5.0-alpha0027" />
         <PackageReference Include="GraphQL.Server.Ui.GraphiQL" Version="3.5.0-alpha0027" />

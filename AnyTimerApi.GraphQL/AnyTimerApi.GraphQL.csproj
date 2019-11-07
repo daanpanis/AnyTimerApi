@@ -5,6 +5,7 @@
     </PropertyGroup>
 
     <ItemGroup>
+      <PackageReference Include="FirebaseAdmin" Version="1.9.1" />
       <PackageReference Include="GraphQL" Version="3.0.0-preview-1268" />
     </ItemGroup>
 

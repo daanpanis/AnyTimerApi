@@ -1,6 +1,5 @@
 using System;
 using GraphQL;
-using GraphQL.Validation;
 
 namespace AnyTimerApi.GraphQL
 {
@@ -11,6 +10,8 @@ namespace AnyTimerApi.GraphQL
 
         public static readonly GraphQLError FriendRequestActive =
             new GraphQLError("friend_request_active", "There is already an active friend request");
+
+        public static readonly GraphQLError UnknownUser = new GraphQLError("unknown_user", "No user found by this id");
     }
 
     public class GraphQLError
