@@ -13,6 +13,7 @@ namespace AnyTimerApi.GraphQL
     {
         public static void AddAnyTimerApp(this IServiceCollection services)
         {
+            services.AddSingleton(k => new UserService(250));
             services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetService));
             services.AddScoped<UserType>();
             services.AddScoped<AnyTimerType>();

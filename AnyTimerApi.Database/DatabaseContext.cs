@@ -1,5 +1,4 @@
 using AnyTimerApi.Database.Entities;
-using AnyTimerApi.Utilities.Extensions;
 using Marques.EFCore.SnakeCase;
 using Microsoft.EntityFrameworkCore;
 

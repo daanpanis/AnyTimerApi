@@ -1,5 +1,6 @@
 ﻿using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
+using AnyTimerApi.GraphQL.Authentication;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
 using AspNetCore.Firebase.Authentication.Extensions;
@@ -18,6 +19,12 @@ namespace AnyTimerApi
 {
     public class Startup
     {
+        private static void InitializeDatabase(IApplicationBuilder app)
+        {
+            using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
+            scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.Migrate();
+        }
+        
         public IConfiguration Configuration { get; }
 
         public Startup(IConfiguration configuration)
@@ -74,12 +81,6 @@ namespace AnyTimerApi
             app.UseHttpsRedirection();
             app.UseGraphQL<AppSchema>();
             app.UseGraphiQLServer(new GraphiQLOptions());
-        }
-        
-        private void InitializeDatabase(IApplicationBuilder app)
-        {
-            using var scope = app.ApplicationServices.GetService<IServiceScopeFactory>().CreateScope();
-            scope.ServiceProvider.GetRequiredService<DatabaseContext>().Database.Migrate();
         }
     }
 }
