@@ -14,18 +14,25 @@ namespace AnyTimerApi.Database
         {
             base.OnModelCreating(builder);
             builder.ToSnakeCase();
-            
-            builder.Entity<StatusEvent>().HasKey(evt => new {evt.AnyTimerId, evt.Status});
+
+
             builder.Entity<Comment>().HasKey(comment => new
             {
                 comment.AnyTimerId, comment.UserId, comment.Time
             });
+            builder.Entity<Comment>().HasOne(comment => comment.AnyTimer);
+
             builder.Entity<AnyTimerSender>().HasKey(sender => new {sender.AnyTimerId, sender.SenderId});
-            builder.Entity<FriendRequest>().HasOne(request => request.Requester);
-            builder.Entity<FriendRequest>().HasOne(request => request.Requested);
+            builder.Entity<AnyTimerSender>().HasOne(sender => sender.AnyTimer);
+
+            builder.Entity<StatusEvent>().HasKey(evt => new {evt.AnyTimerId, evt.Status});
+            builder.Entity<StatusEvent>().HasOne(e => e.AnyTimer);
+
+            builder.Entity<AnyTimer>().HasMany(anyTimer => anyTimer.Senders);
+            builder.Entity<AnyTimer>().HasMany(anyTimer => anyTimer.StatusEvents);
         }
-        
-        public DbSet<User> Users { get; set; }
+
+
         public DbSet<AnyTimer> AnyTimers { get; set; }
         public DbSet<AnyTimerSender> AnyTimerSenders { get; set; }
         public DbSet<Comment> Comments { get; set; }

@@ -1,3 +1,5 @@
+using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.GraphQL.Types;
 using AnyTimerApi.Repository;
 using GraphQL.Types;
@@ -16,34 +18,34 @@ namespace AnyTimerApi.GraphQL.Queries
         public void SetupQueryDefinitions(ObjectGraphType type)
         {
             type.FieldAsync<FriendRequestType>(
-                "request",
+                "friendRequest",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.Id}
-                ),
-                resolve: async context => await _repository.ById(context.GetArgument<string>(SchemaConstants.Id)));
-            type.FieldAsync<FriendRequestType>(
-                "requests",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
-                ),
-                resolve: async context => await _repository.ByUser(context.GetArgument<string>(SchemaConstants.UserId))
-            );
-            type.FieldAsync<ListGraphType<FriendRequestType>>(
-                "sentRequests",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
+                    new QueryArgument<NonNullGraphType<IdGraphType>> {Name = SchemaConstants.Id}
                 ),
                 resolve: async context =>
-                    await _repository.SentRequests(context.GetArgument<string>(SchemaConstants.UserId))
-            );
+                {
+                    var userId = context.User().GetUserId();
+                    var friendRequest = await _repository.ById(context.GetArgument<string>(SchemaConstants.Id));
+                    if (friendRequest == null) return context.Error(GraphQLErrors.UnknownFriendRequest);
+                    if (!friendRequest.RequesterId.Equals(userId) && !friendRequest.RequestedId.Equals(userId))
+                        return context.Error(GraphQLErrors.Unauthorized);
+                    return friendRequest;
+                }
+            ).RequiresAuthentication();
+
             type.FieldAsync<ListGraphType<FriendRequestType>>(
-                "receivedRequests",
+                "friendRequests",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
+                    new QueryArgument<NonNullGraphType<BooleanGraphType>>
+                        {Name = SchemaConstants.OnlyRequested, DefaultValue = false}
                 ),
                 resolve: async context =>
-                    await _repository.ReceivedRequests(context.GetArgument<string>(SchemaConstants.UserId))
-            );
+                {
+                    var userId = context.User().GetUserId();
+                    var onlyRequested = context.GetArgument<bool>(SchemaConstants.OnlyRequested);
+                    return onlyRequested ? await _repository.Requests(userId) : await _repository.All(userId);
+                }
+            ).RequiresAuthentication();
         }
     }
 }

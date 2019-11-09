@@ -12,6 +12,15 @@ namespace AnyTimerApi.GraphQL
             new GraphQLError("friend_request_active", "There is already an active friend request");
 
         public static readonly GraphQLError UnknownUser = new GraphQLError("unknown_user", "No user found by this id");
+
+        public static readonly GraphQLError UnknownFriendRequest =
+            new GraphQLError("unknown_friend_request", "No friend request found by this id");
+
+        public static readonly GraphQLError UnknownAnyTimer =
+            new GraphQLError("unknown_anytimer", "No anytimer found by this id");
+
+        public static readonly GraphQLError Unauthorized =
+            new GraphQLError("unauthorized", "You are not authorized to do this");
     }
 
     public class GraphQLError

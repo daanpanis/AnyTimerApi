@@ -1,12 +1,10 @@
 ﻿using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
-using AnyTimerApi.GraphQL.Authentication;
 using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
 using AspNetCore.Firebase.Authentication.Extensions;
 using FirebaseAdmin;
-using GraphQL.Introspection;
 using GraphQL.Server;
 using GraphQL.Server.Ui.GraphiQL;
 using GraphQL.Types;
@@ -54,10 +52,10 @@ namespace AnyTimerApi
                 Configuration["Jwt:ProjectId"]);
 
 
-            services.AddScoped<IUserRepository, UserRepository>();
             services.AddScoped<IAnyTimerRepository, AnyTimerRepository>();
             services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
-
+            services.AddScoped<ICommentRepository, CommentRepository>();
+            
             services.AddAnyTimerApp(Configuration);
 
             services.AddGraphQL(options =>

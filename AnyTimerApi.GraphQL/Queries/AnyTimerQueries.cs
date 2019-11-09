@@ -1,7 +1,6 @@
-using System;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.GraphQL.Types;
 using AnyTimerApi.Repository;
-using GraphQL;
 using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.Queries
@@ -20,33 +19,30 @@ namespace AnyTimerApi.GraphQL.Queries
             type.FieldAsync<AnyTimerType>(
                 "anytimer",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.Id}
+                    new QueryArgument<NonNullGraphType<IdGraphType>> {Name = SchemaConstants.Id}
                 ),
                 resolve: async context =>
                 {
-                    if (Guid.TryParse(context.GetArgument<string>("ownerId"), out var id))
-                        return await _repository.ById(id);
-                    context.Errors.Add(new ExecutionError("Wrong value for guid"));
-                    return null;
+                    var anyTimer = await _repository.ById(context.GetArgument<string>(SchemaConstants.Id));
+                    if (anyTimer == null) return context.Error(GraphQLErrors.UnknownAnyTimer);
+                    if (!await _repository.IsSender(context.User().GetUserId(), anyTimer.Id))
+                        return context.Error(GraphQLErrors.Unauthorized);
+                    return anyTimer;
                 }
             );
 
             type.FieldAsync<ListGraphType<AnyTimerType>>(
-                "received",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
-                ),
-                resolve: async context =>
-                    await _repository.ReceivedByUser(context.GetArgument<string>(SchemaConstants.UserId))
+                "anytimers",
+                resolve: async context => await _repository.AllForUser(context.User().GetUserId())
             );
 
             type.FieldAsync<ListGraphType<AnyTimerType>>(
-                "sent",
-                arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
-                ),
-                resolve: async context =>
-                    await _repository.SentByUser(context.GetArgument<string>(SchemaConstants.UserId))
+                "anytimersReceived",
+                resolve: async context => await _repository.Received(context.User().GetUserId()));
+
+            type.FieldAsync<ListGraphType<AnyTimerType>>(
+                "anytimersSent",
+                resolve: async context => await _repository.Sent(context.User().GetUserId())
             );
         }
     }

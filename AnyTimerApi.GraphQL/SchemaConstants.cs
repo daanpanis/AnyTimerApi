@@ -8,5 +8,6 @@ namespace AnyTimerApi.GraphQL
         public const string Requester = "requester";
         public const string Requested = "requested";
         public const string Name = "name";
+        public const string OnlyRequested = "onlyRequested";
     }
 }

@@ -22,23 +22,22 @@ namespace AnyTimerApi.GraphQL.Mutations
             type.FieldAsync<RequestFriendResponseType>(
                 "requestFriend",
                 arguments: new QueryArguments(
-                    new QueryArgument(typeof(IdGraphType)) {Name = SchemaConstants.UserId}
+                    new QueryArgument<NonNullGraphType<IdGraphType>> {Name = SchemaConstants.UserId}
                 ),
-                resolve: async (context) =>
+                resolve: async context =>
                 {
+                    var target = await UserService.ById(context.GetArgument<string>(SchemaConstants.UserId));
+                    if (target == null) return context.Error(GraphQLErrors.UnknownUser);
+
                     var response = new RequestFriendResponse
                     {
                         RequesterId = context.User().GetUserId(),
-                        RequestedId = context.GetArgument<string>(SchemaConstants.UserId),
+                        RequestedId = target.Uid,
                         Time = DateTime.Now
                     };
 
-                    var currentRequest = await _repository.ByUsers(response.RequesterId, response.RequestedId);
-                    if (currentRequest != null)
-                    {
-                        context.Errors.Add(GraphQLErrors.FriendRequestActive.Build());
-                        return null;
-                    }
+                    if (await _repository.ByUsers(response.RequesterId, response.RequestedId) != null)
+                        return context.Error(GraphQLErrors.FriendRequestActive);
 
                     await _repository.AddFriendRequest(response.RequesterId, response.RequestedId, response.Time);
                     // TODO Send push notification

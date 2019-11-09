@@ -40,21 +40,26 @@ namespace AnyTimerApi.Repository.Database
             return await _context.FriendRequests.Where(request => request.RequesterId.Equals(userId)).ToListAsync();
         }
 
-        public async Task<ICollection<FriendRequest>> ByUser(string userId)
+        public async Task<ICollection<FriendRequest>> All(string userId)
         {
             return await _context.FriendRequests
                 .Where(request => request.RequesterId.Equals(userId) || request.RequestedId.Equals(userId))
                 .ToListAsync();
         }
 
-        public async Task<ICollection<User>> GetFriends(string userId)
+        public async Task<ICollection<FriendRequest>> Requests(string userId)
         {
             return await _context.FriendRequests
-                .Include(request => request.Requested)
-                .Include(request => request.Requester)
+                .Where(request => request.RequesterId.Equals(userId) || request.RequestedId.Equals(userId))
+                .Where(request => request.Status == FriendRequestStatus.Requested)
+                .ToListAsync();
+        }
+
+        public async Task<ICollection<FriendRequest>> GetFriends(string userId)
+        {
+            return await _context.FriendRequests
                 .Where(request => (request.RequesterId.Equals(userId) || request.RequestedId.Equals(userId)) &&
                                   request.Status == FriendRequestStatus.Accepted)
-                .Select(request => request.RequesterId.Equals(userId) ? request.Requested : request.Requester)
                 .ToListAsync();
         }
 

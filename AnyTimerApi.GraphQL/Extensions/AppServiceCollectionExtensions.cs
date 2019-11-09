@@ -20,6 +20,11 @@ namespace AnyTimerApi.GraphQL.Extensions
             services.AddScoped<FriendRequestType>();
             services.AddScoped<FriendRequestStatusType>();
             services.AddScoped<RequestFriendResponseType>();
+            services.AddScoped<AnyTimerSenderType>();
+            services.AddScoped<AnyTimerStatusType>();
+            services.AddScoped<CommentType>();
+            services.AddScoped<StatusEventType>();
+            
 
             services.AddScoped<UserQueries>();
             services.AddScoped<AnyTimerQueries>();

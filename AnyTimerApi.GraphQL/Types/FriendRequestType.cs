@@ -1,23 +1,24 @@
 using AnyTimerApi.Database.Entities;
-using AnyTimerApi.Repository;
+using AnyTimerApi.GraphQL.Authentication;
 using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.Types
 {
     public class FriendRequestType : ObjectGraphType<FriendRequest>
     {
-        public FriendRequestType(IUserRepository userRepository)
+        public FriendRequestType()
         {
+            Name = "FriendRequest";
             Field(r => r.Id, type: typeof(IdGraphType));
             Field<FriendRequestStatusType>("Status");
             Field(r => r.CreatedTime);
             Field<UserType>(
                 "requester",
-                resolve: context => userRepository.GetById(context.Source.RequesterId)
+                resolve: context => UserService.ById(context.Source.RequesterId)
             );
             Field<UserType>(
                 "requested",
-                resolve: context => userRepository.GetById(context.Source.RequestedId)
+                resolve: context => UserService.ById(context.Source.RequestedId)
             );
         }
     }

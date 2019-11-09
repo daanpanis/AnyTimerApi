@@ -1,4 +1,3 @@
-using System.Diagnostics;
 using System.Security.Claims;
 using System.Threading.Tasks;
 using AnyTimerApi.GraphQL.Authentication;

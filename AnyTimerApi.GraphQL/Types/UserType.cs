@@ -8,6 +8,7 @@ namespace AnyTimerApi.GraphQL.Types
     {
         public UserType(IFriendRequestRepository friendRequestRepository)
         {
+            Name = "User";
             Field(u => u.Uid, type: typeof(IdGraphType));
             Field(SchemaConstants.Name, u => u.DisplayName, nullable: true);
             Field(u => u.Email);

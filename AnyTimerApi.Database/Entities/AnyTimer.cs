@@ -12,8 +12,7 @@ namespace AnyTimerApi.Database.Entities
         [Required] public DateTime LastUpdated { get; set; }
         [Required] public AnyTimerStatus Status { get; set; }
         [Required] public string ReceiverId { get; set; }
-        [ForeignKey("ReceiverId")] public User Receiver { get; set; }
-        public virtual ICollection<User> Senders { get; set; }
+        public virtual ICollection<AnyTimerSender> Senders { get; set; }
         public virtual ICollection<StatusEvent> StatusEvents { get; set; }
     }
 }

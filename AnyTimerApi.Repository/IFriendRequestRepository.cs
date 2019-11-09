@@ -15,9 +15,11 @@ namespace AnyTimerApi.Repository
 
         Task<ICollection<FriendRequest>> SentRequests(string userId);
 
-        Task<ICollection<FriendRequest>> ByUser(string userId);
+        Task<ICollection<FriendRequest>> All(string userId);
 
-        Task<ICollection<User>> GetFriends(string userId);
+        Task<ICollection<FriendRequest>> Requests(string userId);
+        
+        Task<ICollection<FriendRequest>> GetFriends(string userId);
 
         Task<FriendRequest> AddFriendRequest(string requesterId, string requestedId, DateTime time);
     }
