@@ -8,7 +8,7 @@ namespace AnyTimerApi.GraphQL.Types
         public StatusEventType()
         {
             Name = "StatusEvent";
-            Field(e => e.Status);
+            Field<AnyTimerStatusType>("Status");
             Field(e => e.EventTime);
         }
     }

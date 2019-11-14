@@ -13,7 +13,8 @@ namespace AnyTimerApi.GraphQL.Types
             Field(a => a.Id, type: typeof(IdGraphType));
             Field(a => a.CreatedTime);
             Field(a => a.LastUpdated);
-            Field(a => a.Status);
+            Field<AnyTimerStatusType>("Status");
+            Field(a => a.Reason);
             FieldAsync<UserType>(
                 "receiver",
                 resolve: async context => await UserService.ById(context.Source.ReceiverId)

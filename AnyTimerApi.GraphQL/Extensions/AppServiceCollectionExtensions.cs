@@ -1,5 +1,6 @@
 using System;
 using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.InputTypes;
 using AnyTimerApi.GraphQL.Mutations;
 using AnyTimerApi.GraphQL.Queries;
 using AnyTimerApi.GraphQL.Types;
@@ -16,22 +17,25 @@ namespace AnyTimerApi.GraphQL.Extensions
         {
             services.AddScoped<IServiceProvider>(provider => new FuncServiceProvider(provider.GetService));
             services.AddScoped<UserType>();
+            services.AddScoped<AnyTimerSenderType>();
+            services.AddScoped<AnyTimerStatusType>();
             services.AddScoped<AnyTimerType>();
             services.AddScoped<FriendRequestType>();
             services.AddScoped<FriendRequestStatusType>();
             services.AddScoped<RequestFriendResponseType>();
-            services.AddScoped<AnyTimerSenderType>();
-            services.AddScoped<AnyTimerStatusType>();
             services.AddScoped<CommentType>();
             services.AddScoped<StatusEventType>();
-            
+
+            services.AddScoped<AnyTimerInputType>();
+            services.AddScoped<AnyTimerSenderInputType>();
 
             services.AddScoped<UserQueries>();
             services.AddScoped<AnyTimerQueries>();
             services.AddScoped<FriendRequestQueries>();
 
             services.AddScoped<FriendRequestMutations>();
-
+            services.AddScoped<AnyTimerMutations>();
+            
             services.AddTransient<IValidationRule>(s => new AuthenticationValidationRule());
 
             services.AddScoped<AppSchema>();
