@@ -1,15 +1,20 @@
+using System.Collections.Generic;
 using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.InputTypes
 {
-    public class AnyTimerInputType : InputObjectGraphType
+    public class AnyTimerInputType : InputObjectGraphType<AnyTimerInputType>
     {
+        public string Receiver { get; set; }
+        public IList<AnyTimerSenderInputType> Senders { get; set; }
+        public string Reason { get; set; }
+
         public AnyTimerInputType()
         {
             Name = "AnyTimerInput";
-            Field<NonNullGraphType<StringGraphType>>("receiver");
+            Field(o => o.Receiver);
             Field<NonNullGraphType<ListGraphType<AnyTimerSenderInputType>>>("senders");
-            Field<NonNullGraphType<StringGraphType>>("reason");
+            Field(o => o.Reason);
         }
     }
 }

@@ -9,8 +9,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace AnyTimerApi.Database.Migrations
 {
     [DbContext(typeof(DatabaseContext))]
-    [Migration("20191109151547_Removed user entity and switched to Firebase's user records")]
-    partial class RemoveduserentityandswitchedtoFirebasesuserrecords
+    [Migration("20191114122324_Initial migration")]
+    partial class Initialmigration
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
@@ -32,6 +32,11 @@ namespace AnyTimerApi.Database.Migrations
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnName("last_updated")
                         .HasColumnType("datetime(6)");
+
+                    b.Property<string>("Reason")
+                        .IsRequired()
+                        .HasColumnName("reason")
+                        .HasColumnType("longtext");
 
                     b.Property<string>("ReceiverId")
                         .IsRequired()
