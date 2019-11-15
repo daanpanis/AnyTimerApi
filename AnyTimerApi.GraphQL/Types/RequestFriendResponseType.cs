@@ -1,4 +1,4 @@
-using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.GraphQL.Responses;
 using GraphQL.Types;
 
@@ -11,9 +11,9 @@ namespace AnyTimerApi.GraphQL.Types
             Name = "RequestFriendResponse";
             Field(r => r.Time);
             FieldAsync<UserType>(SchemaConstants.Requester,
-                resolve: async context => await UserService.ById(context.Source.RequesterId));
+                resolve: async context => await context.UserRecord(context.Source.RequesterId));
             FieldAsync<UserType>(SchemaConstants.Requested,
-                resolve: async context => await UserService.ById(context.Source.RequestedId));
+                resolve: async context => await context.UserRecord(context.Source.RequestedId));
         }
     }
 }

@@ -10,6 +10,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnyTimerApi.Repository", "A
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnyTimerApi.Utilities", "AnyTimerApi.Utilities\AnyTimerApi.Utilities.csproj", "{A023C46A-B32B-4B66-8CE6-201791A900B4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AnyTimerApi.Redis", "AnyTimerApi.Redis\AnyTimerApi.Redis.csproj", "{4CB48A11-912F-4F7D-9747-8F04A37E374C}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -36,5 +38,9 @@ Global
 		{A023C46A-B32B-4B66-8CE6-201791A900B4}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A023C46A-B32B-4B66-8CE6-201791A900B4}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A023C46A-B32B-4B66-8CE6-201791A900B4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{4CB48A11-912F-4F7D-9747-8F04A37E374C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{4CB48A11-912F-4F7D-9747-8F04A37E374C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{4CB48A11-912F-4F7D-9747-8F04A37E374C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{4CB48A11-912F-4F7D-9747-8F04A37E374C}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

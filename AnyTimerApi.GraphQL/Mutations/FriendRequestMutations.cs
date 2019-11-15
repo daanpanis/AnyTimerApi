@@ -26,8 +26,8 @@ namespace AnyTimerApi.GraphQL.Mutations
                 ),
                 resolve: async context =>
                 {
-                    var target = await UserService.ById(context.GetArgument<string>(SchemaConstants.UserId));
-                    if (target == null) return context.Error(GraphQLErrors.UnknownUser);
+                    var target = await context.UserRecord(context.GetArgument<string>(SchemaConstants.UserId));
+                    if (target == null) return context.Error(GraphQLErrors.UnknownUser());
 
                     var response = new RequestFriendResponse
                     {

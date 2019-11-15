@@ -1,6 +1,7 @@
 ﻿using AnyTimerApi.Database;
 using AnyTimerApi.GraphQL;
 using AnyTimerApi.GraphQL.Extensions;
+using AnyTimerApi.Redis;
 using AnyTimerApi.Repository;
 using AnyTimerApi.Repository.Database;
 using AspNetCore.Firebase.Authentication.Extensions;
@@ -55,15 +56,17 @@ namespace AnyTimerApi
             services.AddScoped<IAnyTimerRepository, AnyTimerRepository>();
             services.AddScoped<IFriendRequestRepository, FriendRequestRepository>();
             services.AddScoped<ICommentRepository, CommentRepository>();
-            
+
             services.AddAnyTimerApp(Configuration);
+            services.AddRedis(Configuration);
 
             services.AddGraphQL(options =>
                 {
                     options.EnableMetrics = true;
                     options.ExposeExceptions = true;
                 })
-                .AddUserContextBuilder(httpContext => new GraphQLUserContext {User = httpContext.User})
+                .AddUserContextBuilder(httpContext => new GraphQLUserContext
+                    {User = httpContext.User, HttpContext = httpContext})
                 .AddGraphTypes(ServiceLifetime.Scoped);
         }
 

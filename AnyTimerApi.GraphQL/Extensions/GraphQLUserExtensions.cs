@@ -1,8 +1,10 @@
 using System.Security.Claims;
 using System.Threading.Tasks;
+using AnyTimerApi.Database.Models;
 using AnyTimerApi.GraphQL.Authentication;
 using FirebaseAdmin.Auth;
 using GraphQL.Types;
+using GraphQL.Utilities;
 using Microsoft.AspNetCore.Http;
 
 namespace AnyTimerApi.GraphQL.Extensions
@@ -19,24 +21,30 @@ namespace AnyTimerApi.GraphQL.Extensions
             return user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
         }
 
-        public static async Task<UserRecord> UserRecord<T>(this ResolveFieldContext<T> context)
+        public static async Task<User> UserRecord<T>(this ResolveFieldContext<T> context)
         {
-            return await UserService.FromRequest(context.User());
+            var userService = (context.UserContext as GraphQLUserContext)?.HttpContext?.RequestServices?
+                .GetRequiredService<UserService>();
+            if (userService == null) return null;
+            return await userService.FromRequest(context.User());
         }
 
-        public static async Task<UserRecord> UserRecord<T>(this ResolveFieldContext<T> context, string userId)
+        public static async Task<User> UserRecord<T>(this ResolveFieldContext<T> context, string userId)
         {
-            return await UserService.ById(userId);
+            var userService = (context.UserContext as GraphQLUserContext)?.HttpContext?.RequestServices
+                ?.GetRequiredService<UserService>();
+            if (userService == null) return null;
+            return await userService.ById(userId);
         }
 
         public static void BindUser(this HttpContext context)
         {
-            UserService.UnBindContextUser(context.User);
+            context.RequestServices.GetRequiredService<UserService>().BindContextUser(context.User);
         }
 
         public static void UnBindUser(this HttpContext context)
         {
-            UserService.BindContextUser(context.User);
+            context.RequestServices.GetRequiredService<UserService>().UnBindContextUser(context.User);
         }
     }
 }

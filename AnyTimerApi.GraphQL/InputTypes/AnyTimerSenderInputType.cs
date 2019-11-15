@@ -2,13 +2,16 @@ using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.InputTypes
 {
-    public class AnyTimerSenderInputType : InputObjectGraphType
+    public class AnyTimerSenderInputType : InputObjectGraphType<AnyTimerSenderInputType>
     {
+        public string User { get; set; }
+        public uint Amount { get; set; }
+
         public AnyTimerSenderInputType()
         {
             Name = "AnyTimerSenderInput";
-            Field<NonNullGraphType<StringGraphType>>("user");
-            Field<NonNullGraphType<UIntGraphType>>("amount");
+            Field(o => o.User);
+            Field(o => o.Amount);
         }
     }
 }

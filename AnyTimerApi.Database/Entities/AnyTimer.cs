@@ -13,6 +13,8 @@ namespace AnyTimerApi.Database.Entities
         [Required] public AnyTimerStatus Status { get; set; }
         [Required] public string ReceiverId { get; set; }
         [Required] public string Reason { get; set; }
+        
+        [Required] public string CreatorId { get; set; }
         public virtual ICollection<AnyTimerSender> Senders { get; set; }
         public virtual ICollection<StatusEvent> StatusEvents { get; set; }
     }

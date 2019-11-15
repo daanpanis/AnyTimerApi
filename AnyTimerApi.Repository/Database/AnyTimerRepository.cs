@@ -1,4 +1,3 @@
-using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -46,13 +45,19 @@ namespace AnyTimerApi.Repository.Database
 
         public async Task<ICollection<StatusEvent>> StatusEvents(string anyTimerId)
         {
-            return await _context.StatusEvents.Where(e => e.AnyTimerId.SequenceEqual(anyTimerId)).ToListAsync();
+            return await _context.StatusEvents.Where(e => e.AnyTimerId.Equals(anyTimerId)).ToListAsync();
         }
 
         public async Task<bool> IsSender(string userId, string anyTimerId)
         {
             return await _context.AnyTimerSenders.AnyAsync(sender =>
                 sender.SenderId.Equals(userId) && sender.AnyTimerId.Equals(anyTimerId));
+        }
+
+        public async Task Save(AnyTimer anytimer)
+        {
+            await _context.AnyTimers.AddAsync(anytimer);
+            await _context.SaveChangesAsync();
         }
     }
 }

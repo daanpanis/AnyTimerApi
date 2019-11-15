@@ -1,10 +1,10 @@
+using AnyTimerApi.Database.Models;
 using AnyTimerApi.Repository;
-using FirebaseAdmin.Auth;
 using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.Types
 {
-    public class UserType : ObjectGraphType<UserRecord>
+    public class UserType : ObjectGraphType<User>
     {
         public UserType(IFriendRequestRepository friendRequestRepository)
         {

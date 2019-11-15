@@ -1,5 +1,5 @@
 using AnyTimerApi.Database.Entities;
-using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using AnyTimerApi.Repository;
 using GraphQL.Types;
 
@@ -17,7 +17,11 @@ namespace AnyTimerApi.GraphQL.Types
             Field(a => a.Reason);
             FieldAsync<UserType>(
                 "receiver",
-                resolve: async context => await UserService.ById(context.Source.ReceiverId)
+                resolve: async context => await context.UserRecord(context.Source.ReceiverId)
+            );
+            FieldAsync<UserType>(
+                "creator",
+                resolve: async context => await context.UserRecord(context.Source.CreatorId)
             );
             FieldAsync<ListGraphType<AnyTimerSenderType>>(
                 "senders",

@@ -1,33 +1,14 @@
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
-using AnyTimerApi.Utilities;
+using AnyTimerApi.Database.Models;
+using AnyTimerApi.Repository;
 using FirebaseAdmin.Auth;
 
 namespace AnyTimerApi.GraphQL.Authentication
 {
-    public static class UserService
+    public class UserService
     {
-        public static int CacheSize { get; set; } = 250;
-        private static readonly LinkedDictionary<string, UserRecord> Cache = new LinkedDictionary<string, UserRecord>();
-
-        private static readonly Dictionary<string, ClaimsPrincipal> ContextBoundUser =
-            new Dictionary<string, ClaimsPrincipal>();
-
-        public static void BindContextUser(ClaimsPrincipal user)
-        {
-            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return;
-            ContextBoundUser[userId] = user;
-        }
-
-        public static void UnBindContextUser(ClaimsPrincipal user)
-        {
-            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null) return;
-            ContextBoundUser.Remove(userId);
-        }
-
         private static async Task<UserRecord> QueryRecord(string userId)
         {
             if (userId == null)
@@ -45,53 +26,86 @@ namespace AnyTimerApi.GraphQL.Authentication
             }
         }
 
-
-        public static async Task<UserRecord> FromRequest(ClaimsPrincipal user)
+        private static User RecordToUser(IUserInfo record)
         {
-            if (user == null || !user.Identity.IsAuthenticated) return null;
-
-            var userId = user.FindFirst(ClaimTypes.NameIdentifier)?.Value;
-            var email = user.FindFirst(ClaimTypes.Email)?.Value;
-            var displayName = user.FindFirst(ClaimTypes.Name)?.Value;
-            if (userId == null) return null;
-            if (!Cache.ContainsKey(userId)) return AddRecord(await QueryRecord(userId));
-
-            var cached = Cache[userId];
-            if ((email != null && !cached.Email.Equals(email)) ||
-                (displayName != null && !cached.DisplayName.Equals(displayName)))
+            return new User
             {
-                return MarkActive(await QueryRecord(userId));
+                Uid = record.Uid,
+                Email = record.Email,
+                DisplayName = record.DisplayName,
+                PhotoUrl = record.PhotoUrl
+            };
+        }
+
+        private readonly IUserRepository _userRepository;
+        private readonly Dictionary<string, ClaimsPrincipal> _contextBoundUser =
+            new Dictionary<string, ClaimsPrincipal>();
+
+        public UserService(IUserRepository userRepository)
+        {
+            _userRepository = userRepository;
+        }
+
+        public void BindContextUser(ClaimsPrincipal user)
+        {
+            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return;
+            _contextBoundUser[userId] = user;
+        }
+
+        public void UnBindContextUser(ClaimsPrincipal user)
+        {
+            var userId = user?.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null) return;
+            _contextBoundUser.Remove(userId);
+        }
+
+        public async Task<User> FromRequest(ClaimsPrincipal principal)
+        {
+            if (principal == null || !principal.Identity.IsAuthenticated) return null;
+
+            var userId = principal.FindFirst(ClaimTypes.NameIdentifier)?.Value;
+            var email = principal.FindFirst(ClaimTypes.Email)?.Value;
+            var displayName = principal.FindFirst(ClaimTypes.Name)?.Value;
+
+            // TODO Get photo url?
+            if (userId == null) return null;
+
+            var user = await _userRepository.ById(userId);
+            if (user == null)
+            {
+                var record = await QueryRecord(userId);
+                user = new User
+                {
+                    Uid = record.Uid,
+                    Email = record.Email,
+                    DisplayName = record.DisplayName,
+                    PhotoUrl = record.PhotoUrl
+                };
+                return user;
             }
 
-            return MarkActive(cached);
+            if (string.Equals(email, user.Email) && string.Equals(displayName, user.DisplayName)) return user;
+
+            await _userRepository.SaveUser(user);
+            return user;
         }
 
-        public static async Task<UserRecord> ById(string userId)
+        public async Task<User> ById(string userId)
         {
             if (userId == null) return null;
-            if (ContextBoundUser.ContainsKey(userId)) return await FromRequest(ContextBoundUser[userId]);
-            if (Cache.ContainsKey(userId)) return MarkActive(Cache[userId]);
-            var userRecord = await QueryRecord(userId);
-            return userRecord == null ? null : AddRecord(userRecord);
-        }
+            if (_contextBoundUser.ContainsKey(userId)) return await FromRequest(_contextBoundUser[userId]);
 
-        private static UserRecord AddRecord(UserRecord record)
-        {
+            var user = await _userRepository.ById(userId);
+
+            if (user != null) return user;
+            var record = await QueryRecord(userId);
             if (record == null) return null;
-            Cache.Add(record.Uid, record);
-            while (Cache.Count > CacheSize)
-            {
-                Cache.RemoveLast();
-            }
 
-            return record;
-        }
+            user = RecordToUser(record);
 
-        private static UserRecord MarkActive(UserRecord record)
-        {
-            if (record == null) return null;
-            Cache[record.Uid] = record;
-            return record;
+            await _userRepository.SaveUser(user);
+            return user;
         }
     }
 }

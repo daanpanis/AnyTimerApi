@@ -1,5 +1,6 @@
 using AnyTimerApi.Database.Entities;
 using AnyTimerApi.GraphQL.Authentication;
+using AnyTimerApi.GraphQL.Extensions;
 using GraphQL.Types;
 
 namespace AnyTimerApi.GraphQL.Types
@@ -12,13 +13,13 @@ namespace AnyTimerApi.GraphQL.Types
             Field(r => r.Id, type: typeof(IdGraphType));
             Field<FriendRequestStatusType>("Status");
             Field(r => r.CreatedTime);
-            Field<UserType>(
+            FieldAsync<UserType>(
                 "requester",
-                resolve: context => UserService.ById(context.Source.RequesterId)
+                resolve: async context => await context.UserRecord(context.Source.RequesterId)
             );
-            Field<UserType>(
+            FieldAsync<UserType>(
                 "requested",
-                resolve: context => UserService.ById(context.Source.RequestedId)
+                resolve: async context => await context.UserRecord(context.Source.RequestedId)
             );
         }
     }

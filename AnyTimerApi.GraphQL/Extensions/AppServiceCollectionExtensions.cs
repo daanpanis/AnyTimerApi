@@ -35,6 +35,8 @@ namespace AnyTimerApi.GraphQL.Extensions
 
             services.AddScoped<FriendRequestMutations>();
             services.AddScoped<AnyTimerMutations>();
+
+            services.AddScoped<UserService>();
             
             services.AddTransient<IValidationRule>(s => new AuthenticationValidationRule());
 
@@ -45,7 +47,7 @@ namespace AnyTimerApi.GraphQL.Extensions
             if (configuration == null) return;
             try
             {
-                UserService.CacheSize = Convert.ToInt32(configuration["AppSettings:UserCacheSize"]);
+                UserMemoryCache.CacheSize = Convert.ToInt32(configuration["AppSettings:UserCacheSize"]);
             }
             catch (FormatException)
             {

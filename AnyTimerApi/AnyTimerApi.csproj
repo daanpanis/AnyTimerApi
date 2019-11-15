@@ -16,6 +16,7 @@
     <ItemGroup>
       <ProjectReference Include="..\AnyTimerApi.Database\AnyTimerApi.Database.csproj" />
       <ProjectReference Include="..\AnyTimerApi.GraphQL\AnyTimerApi.GraphQL.csproj" />
+      <ProjectReference Include="..\AnyTimerApi.Redis\AnyTimerApi.Redis.csproj" />
     </ItemGroup>
     
     <ItemGroup>
