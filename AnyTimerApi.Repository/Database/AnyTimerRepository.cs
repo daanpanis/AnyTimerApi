@@ -54,9 +54,15 @@ namespace AnyTimerApi.Repository.Database
                 sender.SenderId.Equals(userId) && sender.AnyTimerId.Equals(anyTimerId));
         }
 
-        public async Task Save(AnyTimer anytimer)
+        public async Task Add(AnyTimer anytimer)
         {
             await _context.AnyTimers.AddAsync(anytimer);
+            await _context.SaveChangesAsync();
+        }
+
+        public async Task Update(AnyTimer anytimer)
+        {
+            _context.Update(anytimer);
             await _context.SaveChangesAsync();
         }
     }

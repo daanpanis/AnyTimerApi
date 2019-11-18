@@ -19,6 +19,9 @@ namespace AnyTimerApi.Repository
         Task<ICollection<StatusEvent>> StatusEvents(string anyTimerId);
 
         Task<bool> IsSender(string userId, string anyTimerId);
-        Task Save(AnyTimer anytimer);
+
+        Task Add(AnyTimer anytimer);
+        
+        Task Update(AnyTimer anytimer);
     }
 }

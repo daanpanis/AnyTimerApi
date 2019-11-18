@@ -34,6 +34,23 @@ namespace AnyTimerApi.GraphQL
 
         public static readonly GraphQLError NoSenders =
             new GraphQLError("no_senders", "There must be at least one sender");
+
+        public static readonly GraphQLError ReceiverSameAsSender = new GraphQLError("receiver_same_as_sender",
+            "The receiver can't be the same as one of the senders'");
+
+        public static readonly GraphQLError NotReceiver =
+            new GraphQLError("not_receiver", "You are not the receiver of this anytimer");
+
+        public static readonly GraphQLError NotEditable =
+            new GraphQLError("not_editable", "This anytimer isn't editable");
+
+        public static readonly GraphQLError NotCreator =
+            new GraphQLError("not_creator", "You are not the creator of this anytimer");
+
+        public static readonly GraphQLError NotMember =
+            new GraphQLError("not_member", "You are not a member of this anytimer");
+
+        public static readonly GraphQLError UnknownComment = new GraphQLError("unknown_comment", "No comment found");
     }
 
     public class GraphQLError

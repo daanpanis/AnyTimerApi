@@ -15,5 +15,7 @@ namespace AnyTimerApi.Database.Entities
         [MinLength(2)]
         [MaxLength(512)]
         public string Text { get; set; }
+
+        public bool Edited { get; set; }
     }
 }

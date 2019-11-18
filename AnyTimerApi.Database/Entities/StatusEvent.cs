@@ -10,5 +10,6 @@ namespace AnyTimerApi.Database.Entities
         [ForeignKey("AnyTimerId")] public AnyTimer AnyTimer { get; set; }
         [Key] public AnyTimerStatus Status { get; set; }
         [Required] public DateTime EventTime { get; set; }
+        public string Message { get; set; }
     }
 }

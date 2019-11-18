@@ -5,6 +5,7 @@ namespace AnyTimerApi.Database.Entities
         Requested = 'R',
         Disputed = 'D',
         Cancelled = 'C',
-        Accepted = 'A'
+        Accepted = 'A',
+        Edited = 'E'
     }
 }

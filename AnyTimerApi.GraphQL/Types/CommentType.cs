@@ -15,6 +15,7 @@ namespace AnyTimerApi.GraphQL.Types
             );
             Field(c => c.Time);
             Field(c => c.Text);
+            Field(c => c.Edited);
         }
     }
 }

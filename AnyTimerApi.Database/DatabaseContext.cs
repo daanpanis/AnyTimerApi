@@ -21,7 +21,8 @@ namespace AnyTimerApi.Database
                 comment.AnyTimerId, comment.UserId, comment.Time
             });
             builder.Entity<Comment>().HasOne(comment => comment.AnyTimer);
-
+            builder.Entity<Comment>().Property(c => c.Edited).HasDefaultValue(false);
+            
             builder.Entity<AnyTimerSender>().HasKey(sender => new {sender.AnyTimerId, sender.SenderId});
             builder.Entity<AnyTimerSender>().HasOne(sender => sender.AnyTimer);
 

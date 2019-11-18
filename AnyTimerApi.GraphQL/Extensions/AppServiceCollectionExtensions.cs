@@ -28,7 +28,8 @@ namespace AnyTimerApi.GraphQL.Extensions
 
             services.AddScoped<AnyTimerInputType>();
             services.AddScoped<AnyTimerSenderInputType>();
-
+            services.AddScoped<NewAnyTimerInputType>();
+            
             services.AddScoped<UserQueries>();
             services.AddScoped<AnyTimerQueries>();
             services.AddScoped<FriendRequestQueries>();

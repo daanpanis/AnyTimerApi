@@ -14,6 +14,22 @@ namespace AnyTimerApi.GraphQL.Mutations
 {
     public class AnyTimerMutations : IMutation
     {
+        public static StatusEvent UpdateStatus(AnyTimer anytimer, AnyTimerStatus status, string message = null)
+        {
+            anytimer.Status = status;
+            anytimer.LastUpdated = DateTime.Now;
+            if (anytimer.StatusEvents == null) anytimer.StatusEvents = new List<StatusEvent>();
+            var statusEvent = new StatusEvent
+            {
+                Status = status,
+                AnyTimerId = anytimer.Id,
+                EventTime = anytimer.LastUpdated,
+                Message = message
+            };
+            anytimer.StatusEvents.Add(statusEvent);
+            return statusEvent;
+        }
+
         private readonly IAnyTimerRepository _repository;
         private readonly IFriendRequestRepository _friendRepository;
 
@@ -28,15 +44,17 @@ namespace AnyTimerApi.GraphQL.Mutations
             type.FieldAsync<AnyTimerType>(
                 "newAnyTimer",
                 arguments: new QueryArguments(
-                    new QueryArgument<NonNullGraphType<AnyTimerInputType>> {Name = SchemaConstants.Args}
+                    new QueryArgument<NonNullGraphType<NewAnyTimerInputType>> {Name = SchemaConstants.Args}
                 ),
                 resolve: async context =>
                 {
-                    var args = context.GetArgument<AnyTimerInputType>(SchemaConstants.Args);
+                    var args = context.GetArgument<NewAnyTimerInputType>(SchemaConstants.Args);
                     if (args.Senders.Count == 0)
                         return (AnyTimer) context.Error(GraphQLErrors.NoSenders);
 
                     var user = await context.UserRecord();
+                    if (string.Equals(user.Uid, args.Receiver))
+                        return context.Error(GraphQLErrors.ReceiverSameAsSender);
                     var anytimer = new AnyTimer
                     {
                         Id = Guid.NewGuid().ToString(),
@@ -45,7 +63,6 @@ namespace AnyTimerApi.GraphQL.Mutations
                         LastUpdated = DateTime.Now,
                         Status = AnyTimerStatus.Requested,
                         Reason = args.Reason,
-                        Senders = new List<AnyTimerSender>()
                     };
                     var receiver = await context.UserRecord(args.Receiver);
                     if (receiver == null)
@@ -59,12 +76,46 @@ namespace AnyTimerApi.GraphQL.Mutations
 
                     if (context.Errors.Count > 0) return null;
 
-                    await _repository.Save(anytimer);
+                    UpdateStatus(anytimer, AnyTimerStatus.Requested);
+
+                    await _repository.Add(anytimer);
                     // TODO Send push notifications
 
                     return anytimer;
                 }
-            );
+            ).RequiresAuthentication();
+
+            type.FieldAsync<AnyTimerType>(
+                "editAnyTimer",
+                arguments: new QueryArguments(
+                    new QueryArgument<IdGraphType> {Name = SchemaConstants.Id},
+                    new QueryArgument<AnyTimerInputType> {Name = SchemaConstants.Args}
+                ),
+                resolve: async context =>
+                {
+                    var args = context.GetArgument<AnyTimerInputType>(SchemaConstants.Args);
+                    if (args.Senders.Count == 0)
+                        return (AnyTimer) context.Error(GraphQLErrors.NoSenders);
+
+                    var anytimer = await _repository.ById(context.GetArgument<string>(SchemaConstants.Id));
+                    if (anytimer == null) return context.Error(GraphQLErrors.UnknownAnyTimer);
+                    var user = await context.UserRecord();
+                    if (!anytimer.CreatorId.Equals(user.Uid)) return context.Error(GraphQLErrors.NotCreator);
+                    if (anytimer.Status == AnyTimerStatus.Cancelled || anytimer.Status == AnyTimerStatus.Accepted)
+                        return context.Error(GraphQLErrors.NotEditable);
+
+                    anytimer.Reason = args.Reason;
+                    UpdateStatus(anytimer, AnyTimerStatus.Edited);
+
+                    await ResolveSenders(args, anytimer, context);
+
+                    if (context.Errors.Count > 0) return null;
+
+                    await _repository.Update(anytimer);
+
+                    return anytimer;
+                }
+            ).RequiresAuthentication();
         }
 
         private Task ResolveSenders(AnyTimerInputType args, AnyTimer anyTimer,
@@ -72,6 +123,12 @@ namespace AnyTimerApi.GraphQL.Mutations
         {
             return Task.WhenAll(args.Senders.Select(async senderInput =>
             {
+                if (anyTimer.ReceiverId.Equals(senderInput.User))
+                {
+                    context.Error(GraphQLErrors.ReceiverSameAsSender);
+                    return;
+                }
+
                 if (!senderInput.User.Equals(anyTimer.CreatorId))
                 {
                     var sender = await context.UserRecord(senderInput.User);

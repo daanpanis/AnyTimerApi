@@ -14,6 +14,8 @@ namespace AnyTimerApi.GraphQL
             _serviceProvider = serviceProvider;
             SetupMutation<FriendRequestMutations>();
             SetupMutation<AnyTimerMutations>();
+            SetupMutation<AnyTimerStatusMutations>();
+            SetupMutation<CommentMutations>();
         }
 
         private void SetupMutation<T>() where T : IMutation
