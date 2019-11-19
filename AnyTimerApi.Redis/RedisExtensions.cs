@@ -10,7 +10,8 @@ namespace AnyTimerApi.Redis
         public static IServiceCollection AddRedis(this IServiceCollection services, IConfiguration configuration = null)
         {
             BeetleX.Redis.Redis.Default.DataFormater = new JsonFormater();
-            BeetleX.Redis.Redis.Default.Host.AddWriteHost("localhost");
+            BeetleX.Redis.Redis.Default.Host.AddWriteHost((configuration?["Redis:Host"] ?? "localhost") + ":" +
+                                                          int.Parse(configuration?["Redis:Port"] ?? "6379"));
 
             services.AddScoped<IUserRepository, RedisUserRepository>();
 
